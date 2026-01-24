@@ -1,10 +1,10 @@
 import { Routes, Route, Link } from "react-router-dom";
 import { useRef } from "react";
-
 import { AudioEngine } from "./audio/AudioEngine";
+
 import Home from "./pages/Home";
 import Synth from "./pages/Synth";
-import Draw from "./pages/Draw";
+import DrawPage from "./pages/Draw";
 
 function App() {
   const engineRef = useRef(null);
@@ -36,7 +36,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/synth" element={<Synth engine={engineRef.current} />} />
-          <Route path="/draw" element={<Draw engine={engineRef.current} />} />
+          <Route path="/draw" element={<DrawPage />} /> {/* updated */}
         </Routes>
       </div>
     </div>

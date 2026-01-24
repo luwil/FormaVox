@@ -1,79 +1,52 @@
 import { useRef } from "react";
+import PianoNotesMap from "../constants/PianoNotesMap";
 
-export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
+export default function Keyboard({ engine, keysDown, setKeysDown }) {
   const isMouseDown = useRef(false);
 
-  // --- layout constants ---
   const WHITE_KEY_WIDTH = 50;
   const WHITE_KEY_HEIGHT = 150;
   const BLACK_KEY_WIDTH = 30;
   const BLACK_KEY_HEIGHT = 100;
 
-  // Ordered keys (2 octaves)
-  const KEY_ORDER = [
-    // Octave 4
-    "KeyA", // C
-    "KeyW", // C#
-    "KeyS", // D
-    "KeyE", // D#
-    "KeyD", // E
-    "KeyF", // F
-    "KeyT", // F#
-    "KeyG", // G
-    "KeyY", // G#
-    "KeyH", // A
-    "KeyU", // A#
-    "KeyJ", // B
-    "KeyK", // C
+  // Split keys from map
+  const WHITE_KEYS = Object.entries(PianoNotesMap)
+    .filter(([_, data]) => data.type === "white")
+    .map(([code]) => code);
 
-    // Octave 5
-    "KeyO", // C#
-    "KeyL", // D
-    "KeyP", // D#
-    "Semicolon", // E
-    "Quote", // F
-  ];
-
-  const BLACK_KEYS = ["KeyW", "KeyE", "KeyT", "KeyY", "KeyU", "KeyO", "KeyP"];
-
-  // derive white keys in order
-  const WHITE_KEYS = KEY_ORDER.filter((k) => !BLACK_KEYS.includes(k));
+  const BLACK_KEYS = Object.entries(PianoNotesMap)
+    .filter(([_, data]) => data.type === "black")
+    .map(([code]) => code);
 
   const keyboardWidth = WHITE_KEYS.length * WHITE_KEY_WIDTH;
 
-  // --- audio helpers ---
   const playKey = (code) => {
     if (keysDown[code]) return;
-    const freq = noteMap[code];
+    const freq = PianoNotesMap[code].freq;
     if (!freq) return;
-
     const isFirstNote = Object.values(keysDown).every((v) => !v);
     engine.playOscillator(freq, isFirstNote);
     setKeysDown((prev) => ({ ...prev, [code]: true }));
   };
 
   const stopKey = (code) => {
-    const freq = noteMap[code];
+    const freq = PianoNotesMap[code].freq;
     if (!freq) return;
     engine.stopOscillator(freq);
     setKeysDown((prev) => ({ ...prev, [code]: false }));
   };
 
-  // --- mouse handling ---
   const handleMouseDown = (code) => {
     isMouseDown.current = true;
     playKey(code);
   };
-
   const handleMouseUp = (code) => {
     isMouseDown.current = false;
     stopKey(code);
   };
-
   const handleMouseLeave = (code) => {
     if (keysDown[code]) stopKey(code);
   };
-
   const handleMouseEnter = (code) => {
     if (isMouseDown.current) playKey(code);
   };
@@ -114,13 +87,12 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
       ))}
 
       {/* Black keys */}
-      {KEY_ORDER.map((code, idx) => {
-        if (!BLACK_KEYS.includes(code)) return null;
-
-        // count how many white keys come before this key
-        const whiteIndex = KEY_ORDER.slice(0, idx).filter(
-          (k) => !BLACK_KEYS.includes(k)
-        ).length;
+      {BLACK_KEYS.map((code) => {
+        const allKeys = Object.keys(PianoNotesMap);
+        const idx = allKeys.indexOf(code);
+        const whiteIndex = allKeys
+          .slice(0, idx)
+          .filter((k) => PianoNotesMap[k].type === "white").length;
 
         return (
           <div
