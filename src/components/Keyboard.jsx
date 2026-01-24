@@ -59,9 +59,9 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
     <div
       style={{
         position: "relative",
-        width: 700,
+        width: 400,
         height: 150,
-        marginBottom: 20,
+        userSelect: "none",
       }}
       onMouseUp={() => {
         isMouseDown.current = false;

@@ -25,7 +25,7 @@ export default function Synth({ engine }) {
   // --- handle physical keyboard ---
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (keysDown[e.code]) return; // already pressed
+      if (keysDown[e.code]) return;
       const freq = NOTE_MAP[e.code];
       if (!freq) return;
 
@@ -51,24 +51,47 @@ export default function Synth({ engine }) {
   }, [engine, keysDown]);
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>Synth</h2>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 1200,
+          padding: 40,
+          display: "flex",
+          flexDirection: "column",
+          gap: 30,
+        }}
+      >
+        <h2 style={{ margin: 0 }}>Synth</h2>
 
-      <div style={{ marginBottom: 20 }}>
-        <button onClick={() => engine.playOscillator(440, true)}>
-          Play 440 Hz
-        </button>
-        <button onClick={() => engine.stopAll()}>Stop All</button>
+        {/* Oscilloscope scales with width */}
+        <div style={{ width: "100%" }}>
+          <Oscilloscope engine={engine} width={1100} height={300} />
+        </div>
+
+        {/* Keyboard centered */}
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Keyboard
+            engine={engine}
+            noteMap={NOTE_MAP}
+            keysDown={keysDown}
+            setKeysDown={setKeysDown}
+          />
+        </div>
       </div>
-
-      <Oscilloscope engine={engine} />
-
-      <Keyboard
-        engine={engine}
-        noteMap={NOTE_MAP}
-        keysDown={keysDown}
-        setKeysDown={setKeysDown}
-      />
     </div>
   );
 }
