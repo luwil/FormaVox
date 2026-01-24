@@ -1,48 +1,51 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export default function Draw() {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
-  const waveformRef = useRef(Array(600).fill(0)); // store waveform y-values, one per x
-  const prevPosRef = useRef({ x: 0, y: 0 });
 
-  const WIDTH = 600;
-  const HEIGHT = 200;
-  const GRID_LINES = 10;
+  // 🔊 Waveform resolution (audio-quality)
+  const WAVE_RES = 2048;
 
-  // --- Draw grid on canvas ---
-  const drawGrid = (ctx) => {
+  // 🎨 Canvas visual size (responsive)
+  const HEIGHT = 400;
+
+  const waveformRef = useRef(new Float32Array(WAVE_RES).fill(0));
+  const prevRef = useRef({ x: 0, y: 0 });
+
+  const drawGrid = (ctx, width, height) => {
     ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.fillRect(0, 0, width, height);
 
-    ctx.strokeStyle = "#444";
+    ctx.strokeStyle = "#333";
     ctx.lineWidth = 1;
+
+    const lines = 10;
     ctx.beginPath();
-    for (let i = 1; i < GRID_LINES; i++) {
-      ctx.moveTo(0, (HEIGHT / GRID_LINES) * i);
-      ctx.lineTo(WIDTH, (HEIGHT / GRID_LINES) * i);
-      ctx.moveTo((WIDTH / GRID_LINES) * i, 0);
-      ctx.lineTo((WIDTH / GRID_LINES) * i, HEIGHT);
+    for (let i = 1; i < lines; i++) {
+      const y = (height / lines) * i;
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
     }
     ctx.stroke();
 
     // midline
-    ctx.strokeStyle = "#666";
+    ctx.strokeStyle = "#555";
     ctx.beginPath();
-    ctx.moveTo(0, HEIGHT / 2);
-    ctx.lineTo(WIDTH, HEIGHT / 2);
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
     ctx.stroke();
   };
 
-  // --- Draw the waveform line ---
-  const drawWaveformCanvas = (ctx) => {
+  const drawWaveform = (ctx, width, height) => {
     const wf = waveformRef.current;
     ctx.strokeStyle = "cyan";
     ctx.lineWidth = 2;
     ctx.beginPath();
+
     for (let i = 0; i < wf.length; i++) {
-      const x = i;
-      const y = HEIGHT / 2 - wf[i] * (HEIGHT / 2); // map [-1,1] to canvas
+      const x = (i / (wf.length - 1)) * width;
+      const y = height / 2 - wf[i] * (height / 2);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -53,77 +56,99 @@ export default function Draw() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    drawGrid(ctx);
-    drawWaveformCanvas(ctx);
+    drawGrid(ctx, canvas.width, canvas.height);
+    drawWaveform(ctx, canvas.width, canvas.height);
   };
 
   useEffect(() => {
-    render(); // initial render
+    const resize = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = HEIGHT;
+      render();
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
   }, []);
 
-  // --- Map mouse Y to amplitude [-1,1] ---
-  const getMouseAmp = (y) => {
-    return Math.max(-1, Math.min(1, (HEIGHT / 2 - y) / (HEIGHT / 2)));
-  };
+  const getAmpFromY = (y, height) =>
+    Math.max(-1, Math.min(1, (height / 2 - y) / (height / 2)));
 
-  // --- Mouse events ---
+  const getIndexFromX = (x, width) =>
+    Math.max(
+      0,
+      Math.min(WAVE_RES - 1, Math.round((x / width) * (WAVE_RES - 1)))
+    );
+
   const handleMouseDown = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.floor(e.clientX - rect.left);
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    const idx = getIndexFromX(x, canvas.width);
+    waveformRef.current[idx] = getAmpFromY(y, canvas.height);
+
+    prevRef.current = { x: idx, y };
     setDrawing(true);
-    prevPosRef.current = { x, y };
-    waveformRef.current[x] = getMouseAmp(y);
     render();
   };
 
   const handleMouseMove = (e) => {
     if (!drawing) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.floor(e.clientX - rect.left);
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const prevX = prevPosRef.current.x;
-    const prevY = prevPosRef.current.y;
+    const idx = getIndexFromX(x, canvas.width);
+    const amp = getAmpFromY(y, canvas.height);
 
-    const dx = x - prevX;
-    if (dx === 0) return;
+    const prevIdx = prevRef.current.x;
+    const prevAmp = getAmpFromY(prevRef.current.y, canvas.height);
+    const dx = idx - prevIdx;
 
-    // interpolate between previous and current position for smoothness
-    for (let i = 0; i <= Math.abs(dx); i++) {
-      const ix = prevX + (dx > 0 ? i : -i);
-      const iy = prevY + ((y - prevY) * i) / Math.abs(dx);
-      if (ix >= 0 && ix < WIDTH) {
-        waveformRef.current[ix] = getMouseAmp(iy);
+    if (dx !== 0) {
+      // 🖌️ Smooth interpolation = broader brush feel
+      for (let i = 0; i <= Math.abs(dx); i++) {
+        const t = i / Math.abs(dx);
+        const ix = prevIdx + Math.sign(dx) * i;
+        waveformRef.current[ix] = prevAmp + (amp - prevAmp) * t;
       }
     }
 
-    prevPosRef.current = { x, y };
+    prevRef.current = { x: idx, y };
     render();
   };
 
-  const handleMouseUp = () => {
-    setDrawing(false);
-  };
+  const handleMouseUp = () => setDrawing(false);
 
   return (
     <div>
       <h2>Draw Waveform</h2>
+
       <canvas
         ref={canvasRef}
-        width={WIDTH}
-        height={HEIGHT}
-        style={{ border: "1px solid #888", cursor: "crosshair" }}
+        style={{
+          width: "100%",
+          height: HEIGHT,
+          border: "1px solid #888",
+          cursor: "crosshair",
+          display: "block",
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       />
-      <p>
-        Draw one period of a waveform. You can lift the mouse and continue
-        editing the same waveform.
+
+      <p style={{ opacity: 0.7 }}>
+        Draw one continuous waveform. You can lift and continue refining.
       </p>
     </div>
   );
