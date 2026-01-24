@@ -1,6 +1,16 @@
 import { useRef, useEffect } from "react";
 import styles from "./Oscilloscope.module.css";
 
+import {
+  drawOscilloscopeGrid,
+  drawOscilloscopeWaveform,
+} from "../utils/OscilloscopeFunctions";
+
+import {
+  OSCILLOSCOPE_COLORS,
+  GRID_LINE_COUNT,
+} from "../constants/OscilloscopeConfig";
+
 export default function Oscilloscope({ engine, width = 600, height = 200 }) {
   const canvasRef = useRef(null);
 
@@ -14,22 +24,15 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
       const analyser = engine.analyser;
       if (!analyser) return;
 
-      ctx.fillStyle = "#1e1e1e";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Clear canvas + draw grid
+      drawOscilloscopeGrid(ctx, canvas.width, canvas.height, {
+        background: OSCILLOSCOPE_COLORS.background,
+        gridColor: OSCILLOSCOPE_COLORS.grid,
+        midlineColor: OSCILLOSCOPE_COLORS.midline,
+        lines: GRID_LINE_COUNT,
+      });
 
-      // Grid
-      ctx.strokeStyle = "#444";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      const gridLines = 10;
-      for (let i = 1; i < gridLines; i++) {
-        ctx.moveTo(0, (canvas.height / gridLines) * i);
-        ctx.lineTo(canvas.width, (canvas.height / gridLines) * i);
-        ctx.moveTo((canvas.width / gridLines) * i, 0);
-        ctx.lineTo((canvas.width / gridLines) * i, canvas.height);
-      }
-      ctx.stroke();
-
+      // Get waveform data
       const displayedFrequency = 440;
       const sampleRate = engine.audioContext.sampleRate;
       const numSamples = Math.floor(sampleRate / displayedFrequency);
@@ -38,6 +41,7 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
       analyser.getByteTimeDomainData(buffer);
       const waveform = Array.from(buffer, (b) => b / 128 - 1);
 
+      // Align to zero-crossing
       let startIndex = 0;
       for (let i = 1; i < waveform.length; i++) {
         if (waveform[i - 1] < 0 && waveform[i] >= 0) {
@@ -51,19 +55,14 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
         dataArray.push(waveform[(startIndex + i) % waveform.length]);
       }
 
-      const sliceWidth = canvas.width / numSamples;
-      let x = 0;
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#0ff";
-      ctx.beginPath();
-      for (let i = 0; i < numSamples; i++) {
-        const v = dataArray[i];
-        const y = (v * canvas.height) / 2 + canvas.height / 2;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-        x += sliceWidth;
-      }
-      ctx.stroke();
+      // Draw waveform
+      drawOscilloscopeWaveform(
+        ctx,
+        dataArray,
+        canvas.width,
+        canvas.height,
+        OSCILLOSCOPE_COLORS.waveform
+      );
 
       rafId = requestAnimationFrame(draw);
     };

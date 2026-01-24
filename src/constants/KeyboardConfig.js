@@ -1,5 +1,7 @@
-// Each key includes frequency and type ("white" or "black")
-const PianoNotesMap = {
+// Frequencies + key type for a standard piano octave range
+
+/** @type {Record<string, { freq: number, type: "white" | "black" }>} */
+export const KeyboardConfig = {
   KeyA: { freq: 261.63, type: "white" }, // C4
   KeyW: { freq: 277.18, type: "black" }, // C#4
   KeyS: { freq: 293.66, type: "white" }, // D4
@@ -14,7 +16,7 @@ const PianoNotesMap = {
   KeyJ: { freq: 493.88, type: "white" }, // B4
   KeyK: { freq: 523.25, type: "white" }, // C5
 
-  // Second octave
+  // Next octave
   KeyO: { freq: 554.37, type: "black" }, // C#5
   KeyL: { freq: 587.33, type: "white" }, // D5
   KeyP: { freq: 622.25, type: "black" }, // D#5
@@ -22,4 +24,10 @@ const PianoNotesMap = {
   Quote: { freq: 698.46, type: "white" }, // F5
 };
 
-export default PianoNotesMap;
+// Key sizes + colors
+export const KEYBOARD_LAYOUT = {
+  whiteKeyWidth: 50,
+  whiteKeyHeight: 150,
+  blackKeyWidth: 30,
+  blackKeyHeight: 100,
+};

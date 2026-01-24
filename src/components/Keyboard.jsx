@@ -1,63 +1,48 @@
 import { useRef } from "react";
-import PianoNotesMap from "../constants/PianoNotesMap";
 import styles from "./Keyboard.module.css";
+import {
+  getWhiteKeys,
+  getBlackKeys,
+  getWhiteIndex,
+  getKeyData,
+} from "../utils/KeyboardFunctions";
+import { KEYBOARD_LAYOUT } from "../constants/KeyboardConfig";
 
 export default function Keyboard({ engine, keysDown, setKeysDown }) {
   const isMouseDown = useRef(false);
 
-  const WHITE_KEY_WIDTH = 50;
-  const WHITE_KEY_HEIGHT = 150;
-  const BLACK_KEY_WIDTH = 30;
-  const BLACK_KEY_HEIGHT = 100;
+  const { whiteKeyWidth, whiteKeyHeight, blackKeyWidth, blackKeyHeight } =
+    KEYBOARD_LAYOUT;
 
-  const WHITE_KEYS = Object.entries(PianoNotesMap)
-    .filter(([_, data]) => data.type === "white")
-    .map(([code]) => code);
+  const WHITE_KEYS = getWhiteKeys();
+  const BLACK_KEYS = getBlackKeys();
 
-  const BLACK_KEYS = Object.entries(PianoNotesMap)
-    .filter(([_, data]) => data.type === "black")
-    .map(([code]) => code);
-
-  const keyboardWidth = WHITE_KEYS.length * WHITE_KEY_WIDTH;
+  const keyboardWidth = WHITE_KEYS.length * whiteKeyWidth;
 
   const playKey = (code) => {
     if (keysDown[code]) return;
-    const freq = PianoNotesMap[code].freq;
-    if (!freq) return;
+    const data = getKeyData(code);
+    if (!data) return;
+
     const isFirstNote = Object.values(keysDown).every((v) => !v);
-    engine.playOscillator(freq, isFirstNote);
+    engine.playOscillator(data.freq, isFirstNote);
+
     setKeysDown((prev) => ({ ...prev, [code]: true }));
   };
 
   const stopKey = (code) => {
-    const freq = PianoNotesMap[code].freq;
-    if (!freq) return;
-    engine.stopOscillator(freq);
-    setKeysDown((prev) => ({ ...prev, [code]: false }));
-  };
+    const data = getKeyData(code);
+    if (!data) return;
 
-  const handleMouseDown = (code) => {
-    isMouseDown.current = true;
-    playKey(code);
-  };
-  const handleMouseUp = (code) => {
-    isMouseDown.current = false;
-    stopKey(code);
-  };
-  const handleMouseLeave = (code) => {
-    if (keysDown[code]) stopKey(code);
-  };
-  const handleMouseEnter = (code) => {
-    if (isMouseDown.current) playKey(code);
+    engine.stopOscillator(data.freq);
+    setKeysDown((prev) => ({ ...prev, [code]: false }));
   };
 
   return (
     <div
       className={styles.keyboard}
-      style={{ width: keyboardWidth, height: WHITE_KEY_HEIGHT }}
-      onMouseUp={() => {
-        isMouseDown.current = false;
-      }}
+      style={{ width: keyboardWidth, height: whiteKeyHeight }}
+      onMouseUp={() => (isMouseDown.current = false)}
     >
       {WHITE_KEYS.map((code, idx) => (
         <div
@@ -66,23 +51,19 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
             keysDown[code] ? styles.active : ""
           }`}
           style={{
-            left: idx * WHITE_KEY_WIDTH,
-            width: WHITE_KEY_WIDTH,
-            height: WHITE_KEY_HEIGHT,
+            left: idx * whiteKeyWidth,
+            width: whiteKeyWidth,
+            height: whiteKeyHeight,
           }}
-          onMouseDown={() => handleMouseDown(code)}
-          onMouseUp={() => handleMouseUp(code)}
-          onMouseLeave={() => handleMouseLeave(code)}
-          onMouseEnter={() => handleMouseEnter(code)}
+          onMouseDown={() => ((isMouseDown.current = true), playKey(code))}
+          onMouseUp={() => ((isMouseDown.current = false), stopKey(code))}
+          onMouseLeave={() => keysDown[code] && stopKey(code)}
+          onMouseEnter={() => isMouseDown.current && playKey(code)}
         />
       ))}
 
       {BLACK_KEYS.map((code) => {
-        const allKeys = Object.keys(PianoNotesMap);
-        const idx = allKeys.indexOf(code);
-        const whiteIndex = allKeys
-          .slice(0, idx)
-          .filter((k) => PianoNotesMap[k].type === "white").length;
+        const whiteIndex = getWhiteIndex(code);
 
         return (
           <div
@@ -91,14 +72,14 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
               keysDown[code] ? styles.active : ""
             }`}
             style={{
-              left: whiteIndex * WHITE_KEY_WIDTH - BLACK_KEY_WIDTH / 2,
-              width: BLACK_KEY_WIDTH,
-              height: BLACK_KEY_HEIGHT,
+              left: whiteIndex * whiteKeyWidth - blackKeyWidth / 2,
+              width: blackKeyWidth,
+              height: blackKeyHeight,
             }}
-            onMouseDown={() => handleMouseDown(code)}
-            onMouseUp={() => handleMouseUp(code)}
-            onMouseLeave={() => handleMouseLeave(code)}
-            onMouseEnter={() => handleMouseEnter(code)}
+            onMouseDown={() => ((isMouseDown.current = true), playKey(code))}
+            onMouseUp={() => ((isMouseDown.current = false), stopKey(code))}
+            onMouseLeave={() => keysDown[code] && stopKey(code)}
+            onMouseEnter={() => isMouseDown.current && playKey(code)}
           />
         );
       })}
