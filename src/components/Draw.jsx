@@ -1,5 +1,5 @@
-// src/components/Draw.jsx
 import { useRef, useEffect, useState } from "react";
+import styles from "./Draw.module.css";
 
 export default function Draw({ width = "100%", height = 400, onWaveUpdate }) {
   const canvasRef = useRef(null);
@@ -115,16 +115,10 @@ export default function Draw({ width = "100%", height = 400, onWaveUpdate }) {
   const handleMouseUp = () => setDrawing(false);
 
   return (
-    <div>
+    <div className={styles.canvasWrapper}>
       <canvas
         ref={canvasRef}
-        style={{
-          width: width,
-          height: height,
-          border: "1px solid #888",
-          cursor: "crosshair",
-          display: "block",
-        }}
+        className={styles.canvas}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

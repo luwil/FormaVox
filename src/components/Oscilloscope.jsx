@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import styles from "./Oscilloscope.module.css";
 
 export default function Oscilloscope({ engine, width = 600, height = 200 }) {
   const canvasRef = useRef(null);
@@ -29,7 +30,6 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
       }
       ctx.stroke();
 
-      // Always use debugOsc frequency for stable period
       const displayedFrequency = 440;
       const sampleRate = engine.audioContext.sampleRate;
       const numSamples = Math.floor(sampleRate / displayedFrequency);
@@ -38,7 +38,6 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
       analyser.getByteTimeDomainData(buffer);
       const waveform = Array.from(buffer, (b) => b / 128 - 1);
 
-      // Find zero crossing to align
       let startIndex = 0;
       for (let i = 1; i < waveform.length; i++) {
         if (waveform[i - 1] < 0 && waveform[i] >= 0) {
@@ -78,7 +77,7 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
       ref={canvasRef}
       width={width}
       height={height}
-      style={{ border: "1px solid #888", marginTop: 20 }}
+      className={styles.canvasOsc}
     />
   );
 }

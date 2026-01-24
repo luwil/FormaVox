@@ -1,0 +1,29 @@
+.keyboard {
+  position: relative;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.whiteKey {
+  position: absolute;
+  border: 1px solid black;
+  border-radius: 4px;
+  z-index: 1;
+  box-sizing: border-box;
+  background: white;
+}
+
+.whiteKey.active {
+  background: #ccc;
+}
+
+.blackKey {
+  position: absolute;
+  border-radius: 4px;
+  z-index: 2;
+  background: black;
+}
+
+.blackKey.active {
+  background: #555;
+}

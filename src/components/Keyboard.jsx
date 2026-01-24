@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import PianoNotesMap from "../constants/PianoNotesMap";
+import styles from "./Keyboard.module.css";
 
 export default function Keyboard({ engine, keysDown, setKeysDown }) {
   const isMouseDown = useRef(false);
@@ -9,7 +10,6 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
   const BLACK_KEY_WIDTH = 30;
   const BLACK_KEY_HEIGHT = 100;
 
-  // Split keys from map
   const WHITE_KEYS = Object.entries(PianoNotesMap)
     .filter(([_, data]) => data.type === "white")
     .map(([code]) => code);
@@ -53,40 +53,30 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
 
   return (
     <div
-      style={{
-        position: "relative",
-        width: keyboardWidth,
-        height: WHITE_KEY_HEIGHT,
-        margin: "0 auto",
-        userSelect: "none",
-      }}
+      className={styles.keyboard}
+      style={{ width: keyboardWidth, height: WHITE_KEY_HEIGHT }}
       onMouseUp={() => {
         isMouseDown.current = false;
       }}
     >
-      {/* White keys */}
       {WHITE_KEYS.map((code, idx) => (
         <div
           key={code}
+          className={`${styles.whiteKey} ${
+            keysDown[code] ? styles.active : ""
+          }`}
+          style={{
+            left: idx * WHITE_KEY_WIDTH,
+            width: WHITE_KEY_WIDTH,
+            height: WHITE_KEY_HEIGHT,
+          }}
           onMouseDown={() => handleMouseDown(code)}
           onMouseUp={() => handleMouseUp(code)}
           onMouseLeave={() => handleMouseLeave(code)}
           onMouseEnter={() => handleMouseEnter(code)}
-          style={{
-            position: "absolute",
-            left: idx * WHITE_KEY_WIDTH,
-            width: WHITE_KEY_WIDTH,
-            height: WHITE_KEY_HEIGHT,
-            background: keysDown[code] ? "#ccc" : "white",
-            border: "1px solid black",
-            borderRadius: 4,
-            zIndex: 1,
-            boxSizing: "border-box",
-          }}
         />
       ))}
 
-      {/* Black keys */}
       {BLACK_KEYS.map((code) => {
         const allKeys = Object.keys(PianoNotesMap);
         const idx = allKeys.indexOf(code);
@@ -97,19 +87,18 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
         return (
           <div
             key={code}
+            className={`${styles.blackKey} ${
+              keysDown[code] ? styles.active : ""
+            }`}
+            style={{
+              left: whiteIndex * WHITE_KEY_WIDTH - BLACK_KEY_WIDTH / 2,
+              width: BLACK_KEY_WIDTH,
+              height: BLACK_KEY_HEIGHT,
+            }}
             onMouseDown={() => handleMouseDown(code)}
             onMouseUp={() => handleMouseUp(code)}
             onMouseLeave={() => handleMouseLeave(code)}
             onMouseEnter={() => handleMouseEnter(code)}
-            style={{
-              position: "absolute",
-              left: whiteIndex * WHITE_KEY_WIDTH - BLACK_KEY_WIDTH / 2,
-              width: BLACK_KEY_WIDTH,
-              height: BLACK_KEY_HEIGHT,
-              background: keysDown[code] ? "#555" : "black",
-              borderRadius: 4,
-              zIndex: 2,
-            }}
           />
         );
       })}

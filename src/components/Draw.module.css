@@ -1,0 +1,11 @@
+.canvasWrapper {
+  width: 100%;
+  display: block;
+}
+
+.canvas {
+  width: 100%;
+  border: 1px solid #888;
+  cursor: crosshair;
+  display: block;
+}
