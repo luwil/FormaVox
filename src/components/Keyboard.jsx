@@ -3,23 +3,45 @@ import { useRef } from "react";
 export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
   const isMouseDown = useRef(false);
 
-  const KEY_ORDER = [
-    "KeyA",
-    "KeyW",
-    "KeyS",
-    "KeyE",
-    "KeyD",
-    "KeyF",
-    "KeyT",
-    "KeyG",
-    "KeyY",
-    "KeyH",
-    "KeyU",
-    "KeyJ",
-    "KeyK",
-  ];
-  const BLACK_KEYS = ["KeyW", "KeyE", "KeyT", "KeyY", "KeyU"];
+  // --- layout constants ---
+  const WHITE_KEY_WIDTH = 50;
+  const WHITE_KEY_HEIGHT = 150;
+  const BLACK_KEY_WIDTH = 30;
+  const BLACK_KEY_HEIGHT = 100;
 
+  // Ordered keys (2 octaves)
+  const KEY_ORDER = [
+    // Octave 4
+    "KeyA", // C
+    "KeyW", // C#
+    "KeyS", // D
+    "KeyE", // D#
+    "KeyD", // E
+    "KeyF", // F
+    "KeyT", // F#
+    "KeyG", // G
+    "KeyY", // G#
+    "KeyH", // A
+    "KeyU", // A#
+    "KeyJ", // B
+    "KeyK", // C
+
+    // Octave 5
+    "KeyO", // C#
+    "KeyL", // D
+    "KeyP", // D#
+    "Semicolon", // E
+    "Quote", // F
+  ];
+
+  const BLACK_KEYS = ["KeyW", "KeyE", "KeyT", "KeyY", "KeyU", "KeyO", "KeyP"];
+
+  // derive white keys in order
+  const WHITE_KEYS = KEY_ORDER.filter((k) => !BLACK_KEYS.includes(k));
+
+  const keyboardWidth = WHITE_KEYS.length * WHITE_KEY_WIDTH;
+
+  // --- audio helpers ---
   const playKey = (code) => {
     if (keysDown[code]) return;
     const freq = noteMap[code];
@@ -37,6 +59,7 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
     setKeysDown((prev) => ({ ...prev, [code]: false }));
   };
 
+  // --- mouse handling ---
   const handleMouseDown = (code) => {
     isMouseDown.current = true;
     playKey(code);
@@ -59,8 +82,9 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
     <div
       style={{
         position: "relative",
-        width: 400,
-        height: 150,
+        width: keyboardWidth,
+        height: WHITE_KEY_HEIGHT,
+        margin: "0 auto",
         userSelect: "none",
       }}
       onMouseUp={() => {
@@ -68,7 +92,7 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
       }}
     >
       {/* White keys */}
-      {KEY_ORDER.filter((k) => !BLACK_KEYS.includes(k)).map((code, idx) => (
+      {WHITE_KEYS.map((code, idx) => (
         <div
           key={code}
           onMouseDown={() => handleMouseDown(code)}
@@ -77,23 +101,27 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
           onMouseEnter={() => handleMouseEnter(code)}
           style={{
             position: "absolute",
-            left: idx * 50,
-            width: 50,
-            height: 150,
+            left: idx * WHITE_KEY_WIDTH,
+            width: WHITE_KEY_WIDTH,
+            height: WHITE_KEY_HEIGHT,
             background: keysDown[code] ? "#ccc" : "white",
             border: "1px solid black",
             borderRadius: 4,
             zIndex: 1,
             boxSizing: "border-box",
-            userSelect: "none",
           }}
         />
       ))}
 
       {/* Black keys */}
-      {BLACK_KEYS.map((code, idx) => {
-        let leftOffset = 50 * idx + 35;
-        if (idx >= 2) leftOffset += 50;
+      {KEY_ORDER.map((code, idx) => {
+        if (!BLACK_KEYS.includes(code)) return null;
+
+        // count how many white keys come before this key
+        const whiteIndex = KEY_ORDER.slice(0, idx).filter(
+          (k) => !BLACK_KEYS.includes(k)
+        ).length;
+
         return (
           <div
             key={code}
@@ -103,14 +131,12 @@ export default function Keyboard({ engine, noteMap, keysDown, setKeysDown }) {
             onMouseEnter={() => handleMouseEnter(code)}
             style={{
               position: "absolute",
-              left: leftOffset,
-              width: 30,
-              height: 100,
+              left: whiteIndex * WHITE_KEY_WIDTH - BLACK_KEY_WIDTH / 2,
+              width: BLACK_KEY_WIDTH,
+              height: BLACK_KEY_HEIGHT,
               background: keysDown[code] ? "#555" : "black",
               borderRadius: 4,
               zIndex: 2,
-              boxSizing: "border-box",
-              userSelect: "none",
             }}
           />
         );
