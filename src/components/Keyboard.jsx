@@ -5,7 +5,7 @@ import {
   getBlackKeys,
   getWhiteIndex,
   getKeyData,
-} from "../utils/KeyboardFunctions";
+} from "../utils/KeyboardFunctions.js";
 import { KEYBOARD_LAYOUT } from "../constants/KeyboardConfig";
 
 export default function Keyboard({ engine, keysDown, setKeysDown }) {
