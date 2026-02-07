@@ -21,11 +21,11 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
 
   const playKey = (code) => {
     if (keysDown[code]) return;
+
     const data = getKeyData(code);
     if (!data) return;
 
-    const isFirstNote = Object.values(keysDown).every((v) => !v);
-    engine.playOscillator(data.freq, isFirstNote);
+    engine.playNote(data.freq); // ✅ updated
 
     setKeysDown((prev) => ({ ...prev, [code]: true }));
   };
@@ -34,7 +34,8 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
     const data = getKeyData(code);
     if (!data) return;
 
-    engine.stopOscillator(data.freq);
+    engine.stopNote(data.freq); // ✅ updated
+
     setKeysDown((prev) => ({ ...prev, [code]: false }));
   };
 
@@ -44,6 +45,7 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
       style={{ width: keyboardWidth, height: whiteKeyHeight }}
       onMouseUp={() => (isMouseDown.current = false)}
     >
+      {/* White Keys */}
       {WHITE_KEYS.map((code, idx) => (
         <div
           key={code}
@@ -55,13 +57,20 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
             width: whiteKeyWidth,
             height: whiteKeyHeight,
           }}
-          onMouseDown={() => ((isMouseDown.current = true), playKey(code))}
-          onMouseUp={() => ((isMouseDown.current = false), stopKey(code))}
+          onMouseDown={() => {
+            isMouseDown.current = true;
+            playKey(code);
+          }}
+          onMouseUp={() => {
+            isMouseDown.current = false;
+            stopKey(code);
+          }}
           onMouseLeave={() => keysDown[code] && stopKey(code)}
           onMouseEnter={() => isMouseDown.current && playKey(code)}
         />
       ))}
 
+      {/* Black Keys */}
       {BLACK_KEYS.map((code) => {
         const whiteIndex = getWhiteIndex(code);
 
@@ -76,8 +85,14 @@ export default function Keyboard({ engine, keysDown, setKeysDown }) {
               width: blackKeyWidth,
               height: blackKeyHeight,
             }}
-            onMouseDown={() => ((isMouseDown.current = true), playKey(code))}
-            onMouseUp={() => ((isMouseDown.current = false), stopKey(code))}
+            onMouseDown={() => {
+              isMouseDown.current = true;
+              playKey(code);
+            }}
+            onMouseUp={() => {
+              isMouseDown.current = false;
+              stopKey(code);
+            }}
             onMouseLeave={() => keysDown[code] && stopKey(code)}
             onMouseEnter={() => isMouseDown.current && playKey(code)}
           />

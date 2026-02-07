@@ -1,12 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import Oscilloscope from "../components/Oscilloscope";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
+import Draw from "../components/Draw";
 import Keyboard from "../components/Keyboard";
+import Oscilloscope from "../components/Oscilloscope";
 import { KeyboardConfig } from "../constants/KeyboardConfig";
 
 export default function Synth({ engine }) {
   const [keysDown, setKeysDown] = useState({});
 
-  // --- make oscilloscope responsive ---
+  // --- responsive oscilloscope width ---
   const oscWrapRef = useRef(null);
   const [oscWidth, setOscWidth] = useState(0);
 
@@ -14,20 +15,15 @@ export default function Synth({ engine }) {
     const el = oscWrapRef.current;
     if (!el) return;
 
-    const update = () => {
-      setOscWidth(el.clientWidth);
-    };
-
+    const update = () => setOscWidth(el.clientWidth);
     update();
 
-    // ResizeObserver updates when the container changes size (best for responsive layouts)
     const ro = new ResizeObserver(update);
     ro.observe(el);
-
     return () => ro.disconnect();
   }, []);
 
-  // --- handle physical keyboard ---
+  // --- physical keyboard -> play/stop notes ---
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (keysDown[e.code]) return;
@@ -35,8 +31,7 @@ export default function Synth({ engine }) {
       const note = KeyboardConfig[e.code];
       if (!note) return;
 
-      const isFirstNote = Object.values(keysDown).every((v) => !v);
-      engine.playOscillator(note.freq, isFirstNote);
+      engine.playNote(note.freq);
       setKeysDown((prev) => ({ ...prev, [e.code]: true }));
     };
 
@@ -44,7 +39,7 @@ export default function Synth({ engine }) {
       const note = KeyboardConfig[e.code];
       if (!note) return;
 
-      engine.stopOscillator(note.freq);
+      engine.stopNote(note.freq);
       setKeysDown((prev) => ({ ...prev, [e.code]: false }));
     };
 
@@ -60,22 +55,33 @@ export default function Synth({ engine }) {
   return (
     <div className="synth-container">
       <div className="synth-inner">
-        <h2 className="synth-title">Synth</h2>
+        <h2 className="synth-title">Synth + Draw</h2>
 
-        {/* Oscilloscope: responsive to container width */}
-        <div className="oscilloscope-wrapper" ref={oscWrapRef}>
-          {oscWidth > 0 && (
-            <Oscilloscope engine={engine} width={oscWidth} height={300} />
-          )}
+        {/* 1) Draw on top */}
+        <div style={{ width: "100%" }}>
+          <Draw
+            height={320}
+            onWaveUpdate={(wf) => {
+              // IMPORTANT: pass a COPY so we don't fight mutation / stale refs
+              engine.setWaveform(new Float32Array(wf));
+            }}
+          />
         </div>
 
-        {/* Keyboard centered */}
+        {/* 2) Keyboard under it */}
         <div className="keyboard-wrapper">
           <Keyboard
             engine={engine}
             keysDown={keysDown}
             setKeysDown={setKeysDown}
           />
+        </div>
+
+        {/* 3) Oscilloscope at bottom */}
+        <div className="oscilloscope-wrapper" ref={oscWrapRef}>
+          {oscWidth > 0 && (
+            <Oscilloscope engine={engine} width={oscWidth} height={260} />
+          )}
         </div>
       </div>
     </div>

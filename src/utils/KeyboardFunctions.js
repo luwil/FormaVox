@@ -1,29 +1,36 @@
 import { KeyboardConfig } from "../constants/KeyboardConfig";
 
-export const getAllKeyCodes = () => Object.keys(KeyboardConfig);
+const ENTRIES = Object.entries(KeyboardConfig);
+const ALL_KEY_CODES = ENTRIES.map(([code]) => code);
 
-export const getWhiteKeys = () =>
-  Object.entries(KeyboardConfig)
-    .filter(([_, data]) => data.type === "white")
-    .map(([code]) => code);
+const WHITE_KEYS = ENTRIES.filter(([_, data]) => data.type === "white").map(
+  ([code]) => code,
+);
 
-export const getBlackKeys = () =>
-  Object.entries(KeyboardConfig)
-    .filter(([_, data]) => data.type === "black")
-    .map(([code]) => code);
+const BLACK_KEYS = ENTRIES.filter(([_, data]) => data.type === "black").map(
+  ([code]) => code,
+);
 
-export const getWhiteIndex = (keyCode) => {
-  const entries = Object.entries(KeyboardConfig);
-  const idx = entries.findIndex(([code]) => code === keyCode);
-  if (idx === -1) return 0;
+const KEY_DATA = Object.fromEntries(ENTRIES);
 
-  return entries.slice(0, idx).filter(([_, data]) => data.type === "white")
-    .length;
-};
+const WHITE_INDEX = (() => {
+  const map = {};
+  let whitesSoFar = 0;
 
-export const getKeyData = (keyCode) => {
-  const entry = Object.entries(KeyboardConfig).find(
-    ([code]) => code === keyCode
-  );
-  return entry ? entry[1] : null;
-};
+  for (const [code, data] of ENTRIES) {
+    map[code] = whitesSoFar;
+    if (data.type === "white") whitesSoFar += 1;
+  }
+
+  return map;
+})();
+
+export const getAllKeyCodes = () => ALL_KEY_CODES;
+
+export const getWhiteKeys = () => WHITE_KEYS;
+
+export const getBlackKeys = () => BLACK_KEYS;
+
+export const getWhiteIndex = (keyCode) => WHITE_INDEX[keyCode] ?? 0;
+
+export const getKeyData = (keyCode) => KEY_DATA[keyCode] ?? null;
