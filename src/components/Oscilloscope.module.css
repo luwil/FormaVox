@@ -1,4 +1,12 @@
+/* ═══════════════════════════════════════════
+   Oscilloscope — Synthwave
+   ═══════════════════════════════════════════ */
+
 .canvasOsc {
-  border: 1px solid #888;
-  margin-top: 20px;
+  display: block;
+  border: 1px solid var(--sw-grid-bright);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(0, 240, 255, 0.06);
 }

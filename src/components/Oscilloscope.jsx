@@ -29,23 +29,23 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
     const scoreOffset = (captured, reference, offset) => {
       let score = 0;
       for (let i = 0; i < reference.length; i++) {
-        score += reference[i] * captured[(i + offset) % captured.length];
+        score += reference[i] * captured[offset + i];
       }
       return score;
     };
 
-    // Helper: find best offset so captured period matches the reference shape
+    // Helper: find best offset so captured period matches the reference shape.
+    // Only search offsets where a full period fits without wrapping.
     const findBestOffset = (captured, reference) => {
       if (!reference || reference.length < 2) return 0;
 
-      // We only search offsets inside one captured period.
-      // (captured.length is usually analyser.fftSize, like 2048)
-      const limit = Math.min(captured.length, 2048);
+      const limit = captured.length - reference.length;
+      if (limit <= 0) return 0;
 
       let bestOffset = 0;
       let bestScore = -Infinity;
 
-      for (let off = 0; off < limit; off++) {
+      for (let off = 0; off <= limit; off++) {
         const s = scoreOffset(captured, reference, off);
         if (s > bestScore) {
           bestScore = s;
@@ -74,7 +74,7 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
         return;
       }
 
-      // We lock the scope to a fixed reference frequency (debugOsc is also 440)
+      // We lock the scope to a fixed reference frequency matching the debugOsc
       const displayedFrequency = OSCILLOSCOPE_REFERENCE_FREQUENCY ?? 440;
 
       const sampleRate = engine.audioContext.sampleRate;
@@ -96,10 +96,7 @@ export default function Oscilloscope({ engine, width = 600, height = 200 }) {
       const offset = findBestOffset(captured, reference);
 
       // 4) Extract exactly one period, starting at the best offset
-      const period = new Float32Array(numSamples);
-      for (let i = 0; i < numSamples; i++) {
-        period[i] = captured[(offset + i) % captured.length];
-      }
+      const period = captured.subarray(offset, offset + numSamples);
 
       // Draw waveform
       drawOscilloscopeWaveform(

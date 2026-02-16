@@ -3,9 +3,9 @@
  */
 export function drawOscilloscopeGrid(ctx, width, height, options = {}) {
   const {
-    background = "#111",
-    gridColor = "#333",
-    midlineColor = "#555",
+    background = "#07060d",
+    gridColor = "#1a1840",
+    midlineColor = "#3d3580",
     lines = 10,
   } = options;
 
@@ -34,18 +34,23 @@ export function drawOscilloscopeGrid(ctx, width, height, options = {}) {
 }
 
 /**
- * Draw a waveform on the canvas
+ * Draw a waveform with neon glow effect
  */
 export function drawOscilloscopeWaveform(
   ctx,
   waveform,
   width,
   height,
-  color = "cyan",
-  lineWidth = 2
+  color = "#ff2d95",
+  lineWidth = 2,
 ) {
+  // Outer glow pass
+  ctx.save();
   ctx.strokeStyle = color;
-  ctx.lineWidth = lineWidth;
+  ctx.lineWidth = lineWidth + 6;
+  ctx.globalAlpha = 0.15;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 20;
   ctx.beginPath();
   for (let i = 0; i < waveform.length; i++) {
     const x = (i / (waveform.length - 1)) * width;
@@ -54,6 +59,39 @@ export function drawOscilloscopeWaveform(
     else ctx.lineTo(x, y);
   }
   ctx.stroke();
+  ctx.restore();
+
+  // Inner glow pass
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth + 2;
+  ctx.globalAlpha = 0.4;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  for (let i = 0; i < waveform.length; i++) {
+    const x = (i / (waveform.length - 1)) * width;
+    const y = height / 2 - waveform[i] * (height / 2);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // Core line
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 4;
+  ctx.beginPath();
+  for (let i = 0; i < waveform.length; i++) {
+    const x = (i / (waveform.length - 1)) * width;
+    const y = height / 2 - waveform[i] * (height / 2);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
 }
 
 /**
@@ -62,7 +100,7 @@ export function drawOscilloscopeWaveform(
 export const getOscilloscopeIndexFromX = (x, width, resolution) =>
   Math.max(
     0,
-    Math.min(resolution - 1, Math.round((x / width) * (resolution - 1)))
+    Math.min(resolution - 1, Math.round((x / width) * (resolution - 1))),
   );
 
 export const getOscilloscopeAmpFromY = (y, height) =>
@@ -76,7 +114,7 @@ export function interpolateOscilloscopeWaveform(
   startIdx,
   endIdx,
   startAmp,
-  endAmp
+  endAmp,
 ) {
   const dx = endIdx - startIdx;
   if (dx === 0) return;

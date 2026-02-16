@@ -1,3 +1,5 @@
+import { fft } from "../utils/fft.js";
+
 export class AudioEngine {
   constructor() {
     this.audioContext = new AudioContext();
@@ -20,7 +22,7 @@ export class AudioEngine {
     // --- Debug oscillator for oscilloscope only ---
     this.debugOsc = this.audioContext.createOscillator();
     this.debugOsc.type = "sine";
-    this.debugOsc.frequency.value = 440;
+    this.debugOsc.frequency.value = 55;
 
     this.debugGain = this.audioContext.createGain();
     this.debugGain.gain.value = 0;
@@ -72,7 +74,7 @@ export class AudioEngine {
   /**
    * Convert a waveform Float32Array (samples in [-1,1]) into a PeriodicWave
    */
-  setWaveform(waveform, harmonics = 64) {
+  setWaveform(waveform) {
     if (!waveform || waveform.length < 2) return;
 
     this.ensureRunning();
@@ -81,47 +83,44 @@ export class AudioEngine {
     // (so it doesn't get mutated elsewhere)
     this.scopeWaveform = new Float32Array(waveform);
 
-    const N = waveform.length;
+    const N = waveform.length; // 2048 (power of 2)
+    const harmonics = N / 2; // 1024 harmonics from N samples
 
-    // real[n] = cosine coefficient (a_n)
-    // imag[n] = sine coefficient   (b_n)
-    const real = new Float32Array(harmonics + 1);
-    const imag = new Float32Array(harmonics + 1);
+    // Copy waveform into Float64Arrays for FFT
+    const re = new Float64Array(N);
+    const im = new Float64Array(N);
+    for (let i = 0; i < N; i++) re[i] = waveform[i];
 
-    // DC offset (a_0)
-    let dc = 0;
-    for (let k = 0; k < N; k++) dc += waveform[k];
-    real[0] = dc / N;
-    imag[0] = 0;
+    fft(re, im);
 
-    // Harmonics
-    for (let n = 1; n <= harmonics; n++) {
-      let a = 0;
-      let b = 0;
+    // Convert FFT output to PeriodicWave coefficients.
+    // FFT bin k: X[k] = sum x[n] * e^{-j2pi nk/N}
+    // PeriodicWave expects Fourier series coefficients:
+    //   real[k] = a_k (cosine), imag[k] = b_k (sine)
+    // Relationship: a_k = 2*Re(X[k])/N, b_k = -2*Im(X[k])/N  (for k>0)
+    const pwReal = new Float32Array(harmonics + 1);
+    const pwImag = new Float32Array(harmonics + 1);
 
-      for (let k = 0; k < N; k++) {
-        const phase = (2 * Math.PI * n * k) / N;
-        const x = waveform[k];
-        a += x * Math.cos(phase);
-        b += x * Math.sin(phase);
-      }
+    // DC component
+    pwReal[0] = re[0] / N;
+    pwImag[0] = 0;
 
-      // scale for Fourier series
-      real[n] = (2 / N) * a;
-      imag[n] = (2 / N) * b;
+    for (let k = 1; k <= harmonics; k++) {
+      pwReal[k] = (2 * re[k]) / N;
+      pwImag[k] = (-2 * im[k]) / N;
     }
 
-    this.periodicWave = this.audioContext.createPeriodicWave(real, imag, {
+    this.periodicWave = this.audioContext.createPeriodicWave(pwReal, pwImag, {
       disableNormalization: false,
     });
 
-    // Update debug osc so oscilloscope always shows the drawn shape at 440Hz
+    // Update debug osc so oscilloscope always shows the drawn shape
     this.debugOsc.setPeriodicWave(this.periodicWave);
-    this.debugOsc.frequency.setValueAtTime(440, this.audioContext.currentTime);
+    this.debugOsc.frequency.setValueAtTime(55, this.audioContext.currentTime);
   }
 
   // Play a note using the current periodic wave (falls back to sine)
-  playNote(freq, setReference = false) {
+  playNote(freq) {
     this.ensureRunning();
 
     const osc = this.audioContext.createOscillator();
@@ -134,8 +133,6 @@ export class AudioEngine {
     osc.start();
 
     this.oscillators[freq] = osc;
-
-    // setReference kept for compatibility but oscilloscope is locked to debugOsc@440
   }
 
   stopNote(freq) {

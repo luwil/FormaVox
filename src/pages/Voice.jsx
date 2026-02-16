@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import Draw from "../components/Draw";
+import VoiceCapture from "../components/VoiceCapture";
 import Keyboard from "../components/Keyboard";
 import Oscilloscope from "../components/Oscilloscope";
 import { KeyboardConfig } from "../constants/KeyboardConfig";
 
-export default function Synth({ engine }) {
+export default function Voice({ engine }) {
   const [keysDown, setKeysDown] = useState({});
 
   // --- responsive oscilloscope width ---
@@ -55,12 +55,12 @@ export default function Synth({ engine }) {
   return (
     <div className="synth-container">
       <div className="synth-inner">
-        <h2 className="synth-title">Synth + Draw</h2>
+        <h2 className="synth-title">Voice Capture</h2>
 
-        {/* 1) Draw on top */}
+        {/* 1) Voice capture on top */}
         <div className="section-panel">
-          <div className="section-label">Waveform Editor</div>
-          <Draw
+          <div className="section-label">Microphone Input</div>
+          <VoiceCapture
             height={320}
             onWaveUpdate={(wf) => {
               engine.setWaveform(new Float32Array(wf));

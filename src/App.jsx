@@ -1,42 +1,47 @@
-import { Routes, Route, Link } from "react-router-dom";
-import { useRef } from "react";
+import { Routes, Route, NavLink } from "react-router-dom";
+import { useState } from "react";
 import { AudioEngine } from "./audio/AudioEngine";
+import "./App.css";
 
 import Home from "./pages/Home";
 import Synth from "./pages/Synth";
-import DrawPage from "./pages/Draw";
+import Voice from "./pages/Voice";
 
 function App() {
-  const engineRef = useRef(null);
-  if (!engineRef.current) engineRef.current = new AudioEngine();
+  const [engine] = useState(() => new AudioEngine());
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: 40,
-        background: "#111",
-        color: "white",
-        boxSizing: "border-box",
-      }}
-    >
-      <nav style={{ marginBottom: 20 }}>
-        <Link to="/" style={{ marginRight: 20, color: "cyan" }}>
+    <div className="app-shell">
+      <nav className="nav">
+        <span className="nav-brand">FormaVox</span>
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+        >
           Home
-        </Link>
-        <Link to="/synth" style={{ marginRight: 20, color: "cyan" }}>
+        </NavLink>
+        <span className="nav-sep">/</span>
+        <NavLink
+          to="/synth"
+          className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+        >
           Synth
-        </Link>
-        <Link to="/draw" style={{ color: "cyan" }}>
-          Draw
-        </Link>
+        </NavLink>
+        <span className="nav-sep">/</span>
+        <NavLink
+          to="/voice"
+          className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+        >
+          Voice
+        </NavLink>
       </nav>
 
-      <div style={{ flex: 1 }}>
+      <div className="app-content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/synth" element={<Synth engine={engineRef.current} />} />
-          <Route path="/draw" element={<DrawPage />} /> {/* updated */}
+          <Route path="/synth" element={<Synth engine={engine} />} />
+          <Route path="/voice" element={<Voice engine={engine} />} />
         </Routes>
       </div>
     </div>

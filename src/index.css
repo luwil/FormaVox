@@ -1,11 +1,44 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ═══════════════════════════════════════════
+   FormaVox — Synthwave Theme
+   ═══════════════════════════════════════════ */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+:root {
+  /* Synthwave palette */
+  --sw-bg-deep: #07060d;
+  --sw-bg: #0a0a1a;
+  --sw-bg-surface: #0f0e1f;
+  --sw-bg-raised: #151430;
+
+  --sw-pink: #ff2d95;
+  --sw-pink-bright: #ff0080;
+  --sw-pink-dim: #c2185b;
+
+  --sw-cyan: #00f0ff;
+  --sw-cyan-dim: #00a8b5;
+
+  --sw-purple: #b721ff;
+  --sw-purple-dim: #7c3aed;
+
+  --sw-yellow: #ffe14d;
+
+  --sw-grid: #1a1840;
+  --sw-grid-bright: #2d2860;
+  --sw-midline: #3d3580;
+
+  --sw-text: #e8e0f0;
+  --sw-text-dim: rgba(232, 224, 240, 0.5);
+
+  /* Typography */
+  --font-display: "Orbitron", sans-serif;
+  --font-body: "Rajdhani", sans-serif;
+
+  /* Glows */
+  --glow-pink:
+    0 0 10px rgba(255, 45, 149, 0.5), 0 0 30px rgba(255, 45, 149, 0.2);
+  --glow-cyan: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2);
+  --glow-pink-strong:
+    0 0 10px rgba(255, 45, 149, 0.6), 0 0 40px rgba(255, 45, 149, 0.3),
+    0 0 80px rgba(255, 45, 149, 0.1);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,21 +46,55 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
-a:hover {
-  color: #535bf2;
+
+html {
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--sw-text);
+  background: var(--sw-bg-deep);
+}
+
+#root {
+  width: 100%;
+}
+
+/* ── Scanline overlay ── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+/* ── Typography ── */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 h1 {
@@ -35,34 +102,81 @@ h1 {
   line-height: 1.1;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+h2 {
+  font-size: 1.4em;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* ── Links ── */
+a {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--sw-cyan);
+  transition:
+    color 0.2s,
+    text-shadow 0.2s;
+}
+
+a:hover {
+  color: var(--sw-pink);
+  text-shadow: 0 0 12px rgba(255, 45, 149, 0.6);
+}
+
+/* ── Buttons ── */
+button {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6em 1.6em;
+  border: 1px solid var(--sw-pink);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--sw-pink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background: rgba(255, 45, 149, 0.12);
+  box-shadow: var(--glow-pink);
+}
+
+button:active {
+  background: rgba(255, 45, 149, 0.2);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--sw-cyan);
+  outline-offset: 2px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(255, 45, 149, 0.35);
+  color: #fff;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sw-bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sw-purple-dim);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sw-pink-dim);
 }
