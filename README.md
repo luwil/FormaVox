@@ -1,6 +1,25 @@
-# React + Vite
+# FormaVox
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based synthesizer where you draw custom waveforms and play them with an interactive keyboard.
+
+## Getting Started
+
+```bash
+npm install      # Install dependencies (required before first run)
+npm run dev      # Start development server at http://localhost:5173
+```
+
+## Other Commands
+
+```bash
+npm run build    # Production build to dist/
+npm run preview  # Serve production build locally
+npm run lint     # Run ESLint
+```
+
+## About
+
+Built with React + Vite with HMR and ESLint rules.
 
 Currently, two official plugins are available:
 
