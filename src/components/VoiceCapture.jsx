@@ -23,9 +23,10 @@ const RECORD_DURATION_MS = 500;
 
 export default function VoiceCapture({ height = 320, onWaveUpdate }) {
   const canvasRef = useRef(null);
-  const [state, setState] = useState("idle"); // idle | requesting | listening | recording | captured | error
+  const [state, setState] = useState("idle"); // idle | requesting | listening | countdown | recording | captured | error
   const [errorMsg, setErrorMsg] = useState("");
   const [warning, setWarning] = useState("");
+  const [countdownNum, setCountdownNum] = useState(null);
 
   // Refs for mic resources (cleaned up on unmount / state change)
   const audioCtxRef = useRef(null);
@@ -145,13 +146,30 @@ export default function VoiceCapture({ height = 320, onWaveUpdate }) {
     draw();
   };
 
-  const capture = () => {
+  const startCountdown = () => {
+    setWarning("");
+    setState("countdown");
+    setCountdownNum(3);
+
+    let count = 3;
+    const tick = setInterval(() => {
+      count -= 1;
+      if (count > 0) {
+        setCountdownNum(count);
+      } else {
+        clearInterval(tick);
+        setCountdownNum(null);
+        startRecording();
+      }
+    }, 1000);
+  };
+
+  const startRecording = () => {
     const stream = streamRef.current;
     const audioCtx = audioCtxRef.current;
     if (!stream || !audioCtx) return;
 
     setState("recording");
-    setWarning("");
 
     const recorder = new MediaRecorder(stream);
     const chunks = [];
@@ -226,7 +244,14 @@ export default function VoiceCapture({ height = 320, onWaveUpdate }) {
 
   return (
     <div className={styles.container}>
-      <canvas ref={canvasRef} className={styles.canvas} height={height} />
+      <div className={styles.canvasWrap}>
+        <canvas ref={canvasRef} className={styles.canvas} height={height} />
+        {state === "countdown" && countdownNum && (
+          <span key={countdownNum} className={styles.countdown}>
+            {countdownNum}
+          </span>
+        )}
+      </div>
 
       <div className={styles.controls}>
         {state === "idle" && (
@@ -238,8 +263,14 @@ export default function VoiceCapture({ height = 320, onWaveUpdate }) {
         {state === "requesting" && <span>Requesting mic access...</span>}
 
         {state === "listening" && (
-          <button className={styles.btn} onClick={capture}>
+          <button className={styles.btn} onClick={startCountdown}>
             Capture
+          </button>
+        )}
+
+        {state === "countdown" && (
+          <button className={styles.btn} disabled>
+            {countdownNum}...
           </button>
         )}
 

@@ -6,10 +6,39 @@
   gap: 12px;
 }
 
+.canvasWrap {
+  position: relative;
+  width: 100%;
+}
+
 .canvas {
   width: 100%;
   border: 1px solid #888;
   display: block;
+}
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  animation: countPop 0.4s ease-out;
+}
+
+@keyframes countPop {
+  0% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .controls {
