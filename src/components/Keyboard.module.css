@@ -13,44 +13,87 @@
   position: absolute;
   z-index: 1;
   box-sizing: border-box;
-  border: 1px solid var(--sw-grid-bright);
-  border-radius: 0 0 4px 4px;
-  background: linear-gradient(180deg, #1a1838 0%, #12112a 60%, #0e0d22 100%);
+  border: 1px solid rgba(200, 190, 220, 0.3);
+  border-bottom: 2px solid rgba(160, 140, 200, 0.25);
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(
+    180deg,
+    #e8e0f4 0%,
+    #ddd4ee 40%,
+    #cfc4e4 75%,
+    #bfb2d8 100%
+  );
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   transition: all 0.08s ease;
 }
 
 .whiteKey:hover {
-  background: linear-gradient(180deg, #221f48 0%, #181640 60%, #12112a 100%);
-  border-color: var(--sw-purple-dim);
+  background: linear-gradient(
+    180deg,
+    #f0eaff 0%,
+    #e4dcf6 40%,
+    #d8cef0 75%,
+    #ccc0e6 100%
+  );
+  border-color: rgba(183, 33, 255, 0.35);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 0 12px rgba(183, 33, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .whiteKey.active {
-  background: linear-gradient(180deg, #3d1a50 0%, #2a1245 60%, #1a0d30 100%);
+  background: linear-gradient(
+    180deg,
+    #f2d4ee 0%,
+    #e6b8e0 40%,
+    #d8a0d4 75%,
+    #c888c6 100%
+  );
   border-color: var(--sw-pink);
   box-shadow:
-    0 0 12px rgba(255, 45, 149, 0.3),
-    inset 0 0 15px rgba(255, 45, 149, 0.1);
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 18px rgba(255, 45, 149, 0.35),
+    0 0 40px rgba(255, 45, 149, 0.12),
+    inset 0 0 20px rgba(255, 45, 149, 0.1);
+  transform: translateY(1px);
 }
 
 /* ── Black Keys ── */
 .blackKey {
   position: absolute;
   z-index: 2;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(180deg, #0a0918 0%, #060510 100%);
-  border: 1px solid rgba(183, 33, 255, 0.15);
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #2e2648 0%, #221c3a 50%, #18132c 100%);
+  border: 1px solid rgba(183, 33, 255, 0.2);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transition: all 0.08s ease;
 }
 
 .blackKey:hover {
-  background: linear-gradient(180deg, #120f28 0%, #0a0918 100%);
-  border-color: rgba(183, 33, 255, 0.3);
+  background: linear-gradient(180deg, #3a3058 0%, #2c2448 50%, #201a38 100%);
+  border-color: rgba(183, 33, 255, 0.4);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.25),
+    0 0 10px rgba(183, 33, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .blackKey.active {
-  background: linear-gradient(180deg, #2d0a40 0%, #1a0628 100%);
+  background: linear-gradient(180deg, #4a1a60 0%, #381050 50%, #280a3c 100%);
   border-color: var(--sw-purple);
   box-shadow:
-    0 0 10px rgba(183, 33, 255, 0.4),
-    inset 0 0 10px rgba(183, 33, 255, 0.15);
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 0 14px rgba(183, 33, 255, 0.45),
+    0 0 30px rgba(183, 33, 255, 0.15),
+    inset 0 0 12px rgba(183, 33, 255, 0.15);
+  transform: translateY(1px);
 }
