@@ -11,4 +11,4 @@ export const OSCILLOSCOPE_COLORS = {
 
 // Number of horizontal/vertical grid lines
 export const GRID_LINE_COUNT = 10;
-export const OSCILLOSCOPE_REFERENCE_FREQUENCY = 440;
+export const OSCILLOSCOPE_REFERENCE_FREQUENCY = 55;
