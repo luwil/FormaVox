@@ -4,7 +4,6 @@ import { AudioEngine } from "./audio/AudioEngine";
 
 import Home from "./pages/Home";
 import Synth from "./pages/Synth";
-import DrawPage from "./pages/Draw";
 
 function App() {
   const engineRef = useRef(null);
@@ -27,16 +26,12 @@ function App() {
         <Link to="/synth" style={{ marginRight: 20, color: "cyan" }}>
           Synth
         </Link>
-        <Link to="/draw" style={{ color: "cyan" }}>
-          Draw
-        </Link>
       </nav>
 
       <div style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/synth" element={<Synth engine={engineRef.current} />} />
-          <Route path="/draw" element={<DrawPage />} /> {/* updated */}
         </Routes>
       </div>
     </div>
