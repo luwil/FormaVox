@@ -17,6 +17,17 @@ npm run preview  # Serve production build locally
 npm run lint     # Run ESLint
 ```
 
+## Deploy to Vercel
+
+The project includes a `vercel.json` with SPA rewrites so client-side routes work on refresh.
+
+```bash
+npx vercel            # Deploy preview
+npx vercel --prod     # Deploy to production
+```
+
+Vercel auto-detects Vite and sets the build command (`npm run build`) and output directory (`dist`).
+
 ## About
 
 Built with React + Vite with HMR and ESLint rules.
