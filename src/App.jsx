@@ -4,6 +4,7 @@ import { AudioEngine } from "./audio/AudioEngine";
 
 import Home from "./pages/Home";
 import Synth from "./pages/Synth";
+import Voice from "./pages/Voice";
 
 function App() {
   const engineRef = useRef(null);
@@ -26,12 +27,16 @@ function App() {
         <Link to="/synth" style={{ marginRight: 20, color: "cyan" }}>
           Synth
         </Link>
+        <Link to="/voice" style={{ marginRight: 20, color: "cyan" }}>
+          Voice
+        </Link>
       </nav>
 
       <div style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/synth" element={<Synth engine={engineRef.current} />} />
+          <Route path="/voice" element={<Voice engine={engineRef.current} />} />
         </Routes>
       </div>
     </div>
