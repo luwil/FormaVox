@@ -18,7 +18,7 @@ import {
   resampleToLength,
 } from "../utils/pitchDetection";
 
-const LIVE_COLOR = "orange";
+const LIVE_COLOR = "#00f0ff";
 const RECORD_DURATION_MS = 500;
 
 export default function VoiceCapture({ height = 320, onWaveUpdate }) {

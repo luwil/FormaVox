@@ -58,7 +58,8 @@ export default function Voice({ engine }) {
         <h2 className="synth-title">Voice Capture</h2>
 
         {/* 1) Voice capture on top */}
-        <div style={{ width: "100%" }}>
+        <div className="section-panel">
+          <div className="section-label">Microphone Input</div>
           <VoiceCapture
             height={320}
             onWaveUpdate={(wf) => {
@@ -68,19 +69,25 @@ export default function Voice({ engine }) {
         </div>
 
         {/* 2) Keyboard under it */}
-        <div className="keyboard-wrapper">
-          <Keyboard
-            engine={engine}
-            keysDown={keysDown}
-            setKeysDown={setKeysDown}
-          />
+        <div className="section-panel">
+          <div className="section-label">Keyboard</div>
+          <div className="keyboard-wrapper">
+            <Keyboard
+              engine={engine}
+              keysDown={keysDown}
+              setKeysDown={setKeysDown}
+            />
+          </div>
         </div>
 
         {/* 3) Oscilloscope at bottom */}
-        <div className="oscilloscope-wrapper" ref={oscWrapRef}>
-          {oscWidth > 0 && (
-            <Oscilloscope engine={engine} width={oscWidth} height={260} />
-          )}
+        <div className="section-panel">
+          <div className="section-label">Oscilloscope</div>
+          <div className="oscilloscope-wrapper" ref={oscWrapRef}>
+            {oscWidth > 0 && (
+              <Oscilloscope engine={engine} width={oscWidth} height={260} />
+            )}
+          </div>
         </div>
       </div>
     </div>

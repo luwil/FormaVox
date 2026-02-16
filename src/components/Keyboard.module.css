@@ -1,29 +1,56 @@
+/* ═══════════════════════════════════════════
+   Keyboard — Synthwave
+   ═══════════════════════════════════════════ */
+
 .keyboard {
   position: relative;
   margin: 0 auto;
   user-select: none;
 }
 
+/* ── White Keys ── */
 .whiteKey {
   position: absolute;
-  border: 1px solid black;
-  border-radius: 4px;
   z-index: 1;
   box-sizing: border-box;
-  background: white;
+  border: 1px solid var(--sw-grid-bright);
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #1a1838 0%, #12112a 60%, #0e0d22 100%);
+  transition: all 0.08s ease;
+}
+
+.whiteKey:hover {
+  background: linear-gradient(180deg, #221f48 0%, #181640 60%, #12112a 100%);
+  border-color: var(--sw-purple-dim);
 }
 
 .whiteKey.active {
-  background: #ccc;
+  background: linear-gradient(180deg, #3d1a50 0%, #2a1245 60%, #1a0d30 100%);
+  border-color: var(--sw-pink);
+  box-shadow:
+    0 0 12px rgba(255, 45, 149, 0.3),
+    inset 0 0 15px rgba(255, 45, 149, 0.1);
 }
 
+/* ── Black Keys ── */
 .blackKey {
   position: absolute;
-  border-radius: 4px;
   z-index: 2;
-  background: black;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, #0a0918 0%, #060510 100%);
+  border: 1px solid rgba(183, 33, 255, 0.15);
+  transition: all 0.08s ease;
+}
+
+.blackKey:hover {
+  background: linear-gradient(180deg, #120f28 0%, #0a0918 100%);
+  border-color: rgba(183, 33, 255, 0.3);
 }
 
 .blackKey.active {
-  background: #555;
+  background: linear-gradient(180deg, #2d0a40 0%, #1a0628 100%);
+  border-color: var(--sw-purple);
+  box-shadow:
+    0 0 10px rgba(183, 33, 255, 0.4),
+    inset 0 0 10px rgba(183, 33, 255, 0.15);
 }

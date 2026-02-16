@@ -58,30 +58,36 @@ export default function Synth({ engine }) {
         <h2 className="synth-title">Synth + Draw</h2>
 
         {/* 1) Draw on top */}
-        <div style={{ width: "100%" }}>
+        <div className="section-panel">
+          <div className="section-label">Waveform Editor</div>
           <Draw
             height={320}
             onWaveUpdate={(wf) => {
-              // IMPORTANT: pass a COPY so we don't fight mutation / stale refs
               engine.setWaveform(new Float32Array(wf));
             }}
           />
         </div>
 
         {/* 2) Keyboard under it */}
-        <div className="keyboard-wrapper">
-          <Keyboard
-            engine={engine}
-            keysDown={keysDown}
-            setKeysDown={setKeysDown}
-          />
+        <div className="section-panel">
+          <div className="section-label">Keyboard</div>
+          <div className="keyboard-wrapper">
+            <Keyboard
+              engine={engine}
+              keysDown={keysDown}
+              setKeysDown={setKeysDown}
+            />
+          </div>
         </div>
 
         {/* 3) Oscilloscope at bottom */}
-        <div className="oscilloscope-wrapper" ref={oscWrapRef}>
-          {oscWidth > 0 && (
-            <Oscilloscope engine={engine} width={oscWidth} height={260} />
-          )}
+        <div className="section-panel">
+          <div className="section-label">Oscilloscope</div>
+          <div className="oscilloscope-wrapper" ref={oscWrapRef}>
+            {oscWidth > 0 && (
+              <Oscilloscope engine={engine} width={oscWidth} height={260} />
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════
+   Home — Synthwave Hero
+   ═══════════════════════════════════════════ */
+
+.hero {
+  position: relative;
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--sw-bg-deep);
+}
+
+/* ── Perspective Grid Background ── */
+.gridBg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.gridPlane {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -10%;
+  height: 65%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent calc(50% - 1px),
+      rgba(255, 45, 149, 0.45) calc(50% - 1px),
+      rgba(255, 45, 149, 0.45) calc(50%),
+      transparent calc(50%)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 59px,
+      rgba(255, 45, 149, 0.4) 59px,
+      rgba(255, 45, 149, 0.4) 60px
+    );
+  background-size: 80px 60px;
+  transform: perspective(500px) rotateX(65deg);
+  transform-origin: center top;
+  filter: drop-shadow(0 0 6px rgba(255, 45, 149, 0.5));
+  animation: gridScroll 4s linear infinite;
+}
+
+@keyframes gridScroll {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 60px;
+  }
+}
+
+.sun {
+  position: absolute;
+  left: 50%;
+  bottom: 38%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: linear-gradient(
+    0deg,
+    var(--sw-pink) 0%,
+    var(--sw-yellow) 60%,
+    rgba(255, 225, 77, 0) 100%
+  );
+  opacity: 0.25;
+  filter: blur(40px);
+}
+
+/* ── Content ── */
+.content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 20px 80px;
+  animation: heroIn 0.8s ease-out;
+}
+
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Title ── */
+.title {
+  margin: 0 0 12px;
+  font-size: clamp(2.8em, 8vw, 5em);
+  line-height: 1;
+}
+
+.titleMain {
+  color: var(--sw-text);
+  text-shadow: 0 0 30px rgba(232, 224, 240, 0.2);
+}
+
+.titleAccent {
+  color: var(--sw-pink);
+  text-shadow:
+    0 0 20px rgba(255, 45, 149, 0.5),
+    0 0 60px rgba(255, 45, 149, 0.2);
+}
+
+/* ── Tagline ── */
+.tagline {
+  font-family: var(--font-display);
+  font-size: clamp(0.7em, 2vw, 0.9em);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sw-cyan);
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  margin: 0 0 24px;
+}
+
+/* ── Divider ── */
+.divider {
+  width: 120px;
+  height: 1px;
+  margin: 0 auto 24px;
+  background: linear-gradient(90deg, transparent, var(--sw-pink), transparent);
+}
+
+/* ── Description ── */
+.desc {
+  max-width: 440px;
+  margin: 0 auto 36px;
+  font-size: 1.1em;
+  line-height: 1.7;
+  color: var(--sw-text-dim);
+}
+
+/* ── CTA Buttons ── */
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  font-family: var(--font-display);
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.ctaPrimary {
+  background: linear-gradient(135deg, var(--sw-pink), var(--sw-pink-bright));
+  color: #fff;
+  border: none;
+  box-shadow: 0 0 16px rgba(255, 45, 149, 0.25);
+}
+
+.ctaPrimary:hover {
+  color: #fff;
+  text-shadow: none;
+  box-shadow: 0 0 24px rgba(255, 45, 149, 0.4);
+  transform: translateY(-2px);
+}
+
+.ctaSecondary {
+  border: 1px solid var(--sw-cyan);
+  color: var(--sw-cyan);
+  background: rgba(0, 240, 255, 0.04);
+}
+
+.ctaSecondary:hover {
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ── Keyboard Hints ── */
+.hints {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hint {
+  font-family: var(--font-display);
+  font-size: 0.6em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sw-text-dim);
+}
+
+.kbd {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 1em;
+  font-weight: 700;
+  padding: 2px 7px;
+  margin: 0 2px;
+  border: 1px solid var(--sw-grid-bright);
+  border-radius: 3px;
+  background: var(--sw-bg-raised);
+  color: var(--sw-cyan);
+  text-shadow: 0 0 4px rgba(0, 240, 255, 0.3);
+}
