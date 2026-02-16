@@ -1,5 +1,5 @@
 import { Routes, Route, NavLink } from "react-router-dom";
-import { useRef } from "react";
+import { useState } from "react";
 import { AudioEngine } from "./audio/AudioEngine";
 import "./App.css";
 
@@ -8,8 +8,7 @@ import Synth from "./pages/Synth";
 import Voice from "./pages/Voice";
 
 function App() {
-  const engineRef = useRef(null);
-  if (!engineRef.current) engineRef.current = new AudioEngine();
+  const [engine] = useState(() => new AudioEngine());
 
   return (
     <div className="app-shell">
@@ -41,8 +40,8 @@ function App() {
       <div className="app-content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/synth" element={<Synth engine={engineRef.current} />} />
-          <Route path="/voice" element={<Voice engine={engineRef.current} />} />
+          <Route path="/synth" element={<Synth engine={engine} />} />
+          <Route path="/voice" element={<Voice engine={engine} />} />
         </Routes>
       </div>
     </div>

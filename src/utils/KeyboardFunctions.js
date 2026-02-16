@@ -3,11 +3,11 @@ import { KeyboardConfig } from "../constants/KeyboardConfig";
 const ENTRIES = Object.entries(KeyboardConfig);
 const ALL_KEY_CODES = ENTRIES.map(([code]) => code);
 
-const WHITE_KEYS = ENTRIES.filter(([_, data]) => data.type === "white").map(
+const WHITE_KEYS = ENTRIES.filter(([, data]) => data.type === "white").map(
   ([code]) => code,
 );
 
-const BLACK_KEYS = ENTRIES.filter(([_, data]) => data.type === "black").map(
+const BLACK_KEYS = ENTRIES.filter(([, data]) => data.type === "black").map(
   ([code]) => code,
 );
 
